@@ -1,0 +1,23 @@
+<html>
+ <head></head>
+ <body>
+  <p>Complete the code below to find out the term at the following location: <code class="language-python">(3, 11)</code>. Use the IDE to solve the task and copy the answer (the term from the vocabulary) in the box.</p> 
+  <pre><code class="language-python">from sklearn.feature_extraction.text import TfidfVectorizer
+
+dataset = ["Yesterday",
+           "All my troubles seemed so far away",
+           "Now it looks as though they're here to stay",
+           "Oh, I believe in yesterday"]
+
+vectorizer = TfidfVectorizer()
+tfidf_matrix = vectorizer.fit_transform(dataset)
+terms = vectorizer.get_feature_names()
+
+# your code here</code></pre> 
+  <p><button class="btn-sm btn-outline-secondary" onclick="getElementById('hint-673').style.display='inline'"> Hint </button> </p>
+  <div id="hint-673" style="display:none;">
+   Remember that the location consists of indexes.
+  </div>
+  <p></p>
+ </body>
+</html>

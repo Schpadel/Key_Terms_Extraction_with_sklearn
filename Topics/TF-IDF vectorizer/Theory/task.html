@@ -1,0 +1,146 @@
+<h2>TF-IDF vectorizer</h2>
+<html>
+ <head></head>
+ <body>
+  <p>Artificial Intelligence (AI), Machine Learning (ML), and Natural Language Processing (NLP) subsets often use the same methods and tools. <code class="language-python">Sklearn</code>, a well-known Python ML library, comprises a lot of useful and ready-made <strong>methods</strong>, <strong>metrics</strong>, and <strong>algorithms</strong>. We will take a look at one of the classical NLP word representations – <strong>TF-IDF</strong>.</p> 
+  <h5>TF-IDF calculations</h5> 
+  <p>First of all, let's briefly review what TF-IDF is. TF-IDF stands for <strong>Term Frequency-Inverse Document Frequency</strong>.<strong> </strong>It denotes a way to statistically reflect how important a word is for a document in a collection. It is basically a metric to evaluate a word's <strong>importance </strong>or to construct <strong>word representation vectors</strong>. </p> 
+  <p>TF-IDF consists of two parts:</p> 
+  <ul> 
+   <li><strong>term frequency</strong> that shows how often a word is used in a particular document:</li> 
+  </ul> 
+  <p style="text-align: center;"><span class="math-tex">\(tf(w,d)={number\ of\ times\ w\ appears\ in\ d \over the\ total\ number\ of\ words\ in\ d}\)</span></p> 
+  <ul> 
+   <li><strong>inverse document frequency </strong>that illustrates how often a word occurs across the whole collection. This part of the formula in <code class="language-python">sklearn</code> is slightly different from the standard formula:</li> 
+  </ul> 
+  <p style="text-align: center;"><span class="math-tex">\(idf(w,D)=log{(the\ total\ number\ of\ documents\ in\ D )\ +\ 1 \over (the\ number\ of\ documents\ in\ D\ that\ include\ w)\ +\ 1}\ +\ 1\)</span></p> 
+  <p>It is used when <code class="language-python">smooth_idf</code> of the <code class="language-python">TfidfVectorizer</code> class (we will discuss this class below) is set to <code class="language-python">True</code>. It is <code class="language-python">True</code> by default value, otherwise, 1 is added only once – to the IDF, after the logarithm has been settled. In both cases, this is done to prevent division by zero. </p> 
+  <p>The final TF-IDF score is calculated in the usual way:</p> 
+  <p style="text-align: center;"><span class="math-tex">\(tfidf(w)=tf(w,d)×idf(w,D)\)</span></p> 
+  <p>Now, let's take a look at how we can compute TF-IDF in <code class="language-python">sklearn</code>.</p> 
+  <h5>Class parameters and attributes</h5> 
+  <p>The most convenient way to get a TF-IDF matrix for your data with <code class="language-python">sklearn</code> is to use the <code class="language-python">TfidfVectorizer</code> class. Take a look at the <a target="_blank" href="https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html" rel="noopener noreferrer nofollow">official documentation</a>, if you're interested. At first, we need to import it<span style="color: #000000;"> </span>and create an instance:</p> 
+  <pre><code class="language-python">from sklearn.feature_extraction.text import TfidfVectorizer
+
+vectorizer = TfidfVectorizer()
+
+dataset = ["So no one told you life was gonna be this way",
+           "Your job's a joke, you're broke",
+           "Your love life's DOA",
+           "It's like you're always stuck in second gear",
+           "When it hasn't been your day, your week, your month",
+           "Or even your year, but",
+           "I'll be there for you"]</code></pre> 
+  <p>Each string in our dataset represents <strong>a separate document</strong>; we have seven documents in total. They form our document collection.</p> 
+  <p><code class="language-python">TfidfVectorizer</code> class has a lot of parameters. Let's have a look at some of them:</p> 
+  <ul style="list-style-type: square;"> 
+   <li><code class="language-python">input='content'</code> is the default value. The program expects data as a sequence of <strong>strings </strong>or <strong>bytes</strong>, like our <code class="language-python">dataset</code> above. Alternatively, with <code class="language-python">input='file'</code>, you can provide a sequence of files (as files are expected, they have to be opened first), <code class="language-python">input='filename'</code> – a sequence of filenames;</li> 
+   <li>the <code class="language-python">encoding</code> parameter with the default value of <code class="language-python">utf-8</code> can be useful if your input data is <strong>a file object</strong>;</li> 
+   <li>boolean <code class="language-python">use_idf</code>, when set to <code class="language-python">False</code>, tells the vectorizer to calculate only the TF;</li> 
+   <li>boolean <code class="language-python">lowercase</code> (if <code class="language-python">False</code>) makes the vectorizer case-sensitive. It is <code class="language-python">True</code>;</li> 
+   <li><code class="language-python">analyzer</code> is used to set the level of processing, it can be a character or a word level (<code class="language-python">analyzer='char'</code> or <code class="language-python">'word'</code> correspondingly);</li> 
+   <li><code class="language-python">ngram_range=(1, 5)</code> tuple sets the lower (the first value) and the upper (the second value) <strong>n-gram limits </strong>for extraction; </li> 
+   <li><code class="language-python">stop_words</code> can provide you with a list of words that have to be removed from the data before calculations;</li> 
+   <li><code class="language-python">vocabulary</code> can allow you to calculate only the scores of the words you want;</li> 
+   <li><code class="language-python">min_df</code> and <code class="language-python">max_df</code> (<code class="language-python">float</code><em> </em>for percentage frequency or <code class="language-python">int</code><em> </em>for absolute frequency) can set the thresholds for a term document frequency.</li> 
+  </ul> 
+  <p></p>
+  <div class="alert alert-primary">
+   N-gram is a sequence consisting of n items, words, or characters. Here are some examples of word bigrams: "my friend", "they will", "for a"; and trigrams: "lin", "tyd", "mak".
+  </div>
+  <p></p> 
+  <p>The following vectorizer, for example, <strong>takes </strong>a sequence of byte strings, <strong>converts </strong>it into lowercase, <strong>extracts </strong>uni- and bigrams, and <strong>calculates </strong>a TF-IDF score. It doesn't contain stop words (<code class="language-python">stop_words</code>) and doesn't make calculations for <code class="language-python">vocabulary</code>, however, the n-grams that occur in more than 60% of documents and less than 1% of documents will be ignored.</p> 
+  <pre><code class="language-python">vectorizer = TfidfVectorizer(input='content', use_idf=True, lowercase=True, analyzer='word', ngram_range=(1, 2), stop_words=None, vocabulary=None, min_df=0.01, max_df=0.60)</code></pre> 
+  <p><button class="btn-sm btn-outline-secondary" onclick="getElementById('hint-5941').style.display='inline'"> Hint </button> </p>
+  <div id="hint-5941" style="display:none;">
+   <code class="language-python">Sklearn</code> also contains the 
+   <code class="language-python">CountVectorizer</code> 
+   <a target="_blank" href="https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html#sklearn.feature_extraction.text.CountVectorizer" rel="noopener noreferrer nofollow">class</a> — it builds vectors with term counts. You can use it to represent words in a text.
+  </div>
+  <p></p> 
+  <h5>fit_transform()</h5> 
+  <p>Once we've created a vectorizer instance, it's time to obtain a <strong>TF-IDF matrix</strong>. We can use the <code class="language-python">fit_transform()</code> class method and <code class="language-python">shape</code> to print out its dimension:</p> 
+  <pre><code class="language-python">tfidf_matrix = vectorizer.fit_transform(dataset)
+print("Matrix dimension:", tfidf_matrix.shape)  # Matrix dimension: (7, 38)</code></pre> 
+  <p>If <code class="language-python">dataset</code> is a file-like object, we need to open it in advance. Moreover, <code class="language-python">fit_transform()</code> still needs a <strong>sequence </strong>as input, so we include the opened file in a list:</p> 
+  <pre><code class="language-python">dataset = open('my_data.txt', 'r')
+
+vectorizer = TfidfVectorizer(input='file')
+tfidf_matrix = vectorizer.fit_transform([dataset])  # the argument must be a sequence</code></pre> 
+  <p>As you've probably guessed, 7 rows in the matrix correspond to the number of documents in our dataset. So, the number of columns reflects the number of different terms (<strong>the vocabulary size</strong>). If you print the matrix, you will get something like this:</p> 
+  <pre><code class="language-python">print(tfidf_matrix)
+
+# (0, 32)	0.32013213618851233
+# (0, 29)	0.32013213618851233
+# (0, 1)	0.26573716575927475
+# ...
+# (3, 0)	0.35903541343111484
+# (3, 17)	0.35903541343111484
+# ...
+# (6, 1)	0.4115330003294659
+# (6, 36)	0.3054049222662203</code></pre> 
+  <p>To access the term weights of a particular document, use the indexation. You will get a ready-to-use representation for your document:</p> 
+  <pre><code class="language-python">print(tfidf_matrix[6])
+
+# (0, 8)	0.4957715949559137
+# (0, 28)	0.4957715949559137
+# (0, 18)	0.4957715949559137
+# (0, 1)	0.4115330003294659
+# (0, 36)	0.3054049222662203</code></pre> 
+  <p>On the left, you can see the location of a particular term in the matrix (a document number, a term index); on the right, you can see the scores.</p> 
+  <h5>get_feature_names()</h5> 
+  <p>The numbers above don't tell us much about the scores of particular words as we don't know how the vocabulary is built. To see the vocabulary, use the <code class="language-python">get_feature_names()</code> method:</p> 
+  <pre><code class="language-python">terms = vectorizer.get_feature_names()
+print(terms)
+
+# ['always', 'be', 'been', 'broke', 'but', 'day', 'doa', 'even', 'for', 'gear', 'gonna', 'hasn', 'in', 'it', 'job', 'joke', 'life', 'like', 'll', 'love', 'month', 'no', 'one', 'or', 're', 'second', 'so', 'stuck', 'there', 'this', 'told', 'was', 'way', 'week', 'when', 'year', 'you', 'your']</code></pre> 
+  <p></p>
+  <div class="alert alert-primary">
+   We haven't preprocessed the documents, so some words in the vocabulary may seem weird. It may be a good idea to do something about apostrophes to prevent some words like "hasn" from appearing.
+  </div>
+  <p></p> 
+  <p>You can get a tangible representation by using a library for data analysis like <a target="_blank" href="https://pandas.pydata.org/" rel="noopener noreferrer nofollow">Pandas</a>. We can also take a look at some of the results using standard Python tools as well.</p> 
+  <p>As you know, word indexes in a returned list correspond to those in the vocabulary. If you see the following line in the TF-IDF matrix: <code class="language-python"># (0, 8) 0.4957715949559137</code>, it means that you can access the corresponding word using the following indexation:</p> 
+  <pre><code class="language-python">print(terms[8])  # for</code></pre> 
+  <p>Bear in mind that the size of the collection can be much larger than ours. Because of this, printing the whole matrix (or even a part) for a specific document can take a long time and still won't be very representative. Nevertheless, if you need a more convenient way to represent the results, you can try to get a list of terms sorted by their TF-IDF scores. It requires more advanced tools, we won't mention them now. <a target="_blank" href="https://numpy.org/" rel="noopener noreferrer nofollow">Numpy</a> or Pandas can help you with that.</p> 
+  <h5>Specifying vocabulary parameters</h5> 
+  <p>Now we will consider a few examples that illustrate in detail how <code class="language-python">stopwords</code> and <code class="language-python">vocabulary</code> parameters work.</p> 
+  <p>If we provide a list of stopwords, these words will be <strong>excluded </strong>from the vocabulary and, subsequently, from the matrix:</p> 
+  <pre><code class="language-python">stopwords = ['so', 'or', 'be']
+
+vectorizer = TfidfVectorizer(stop_words=stopwords)
+tfidf_matrix = vectorizer.fit_transform(dataset)
+terms = vectorizer.get_feature_names()
+print(terms)  # compare the list with the one above: words 'so', 'or', and 'be' are not in the vocabulary
+
+# ['always', 'been', 'broke', 'but', 'day', 'doa', 'even', 'for', 'gear', 'gonna', 'hasn', 'in', 'it', 'job', 'joke', 'life', 'like', 'll', 'love', 'month', 'no', 'one', 're', 'second', 'stuck', 'there', 'this', 'told', 'was', 'way', 'week', 'when', 'year', 'you', 'your']</code></pre> 
+  <p>In case you only want to know the importance of particular words, mention them in the <code class="language-python">vocabulary</code> parameter; the final matrix will only contain their scores:</p> 
+  <pre><code class="language-python">my_vocab = ['it', 'your']
+vectorizer = TfidfVectorizer(vocabulary=my_vocab)
+
+tfidf_matrix = vectorizer.fit_transform(dataset)
+terms = vectorizer.get_feature_names()
+
+print(terms)  # ['it', 'your']
+
+print(tfidf_matrix)
+
+# (1, 1)	1.0
+# (2, 1)	1.0
+# (3, 0)	1.0
+# (4, 1)	0.9122058069917823
+# (4, 0)	0.40973230979564096
+# (5, 1)	1.0</code></pre> 
+  <p>The first tuple value is the index of a document in our collection; the second is the index of a term in the vocabulary.</p> 
+  <h5>Summary</h5> 
+  <p>So, let's summarize what we've learned in this topic:</p> 
+  <ul> 
+   <li>reviewed what TF-IDF is;</li> 
+   <li>familiarized ourselves with how TF-IDF is calculated in <code class="language-python">sklearn</code>;</li> 
+   <li>learned how to use the <code class="language-python">TfidfVectorizer</code> class to calculate a TF-IDF score;</li> 
+   <li>took a look at <code class="language-python">TfidfVectorizer</code> parameters;</li> 
+   <li>used a couple of class methods;</li> 
+   <li>learned to interpret and work with output matrixes.</li> 
+  </ul>
+ </body>
+</html>
